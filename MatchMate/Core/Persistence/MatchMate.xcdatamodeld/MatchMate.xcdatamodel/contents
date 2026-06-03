@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788.4" systemVersion="24.0.0" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="NO" userDefinedModelVersionIdentifier="">
+    <entity name="MatchEntity" representedClassName="MatchEntity" syncable="YES" codeGenerationType="class">
+        <attribute name="age" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="city" attributeType="String" defaultValueString=""/>
+        <attribute name="country" attributeType="String" defaultValueString=""/>
+        <attribute name="email" attributeType="String" defaultValueString=""/>
+        <attribute name="fetchedAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="firstName" attributeType="String" defaultValueString=""/>
+        <attribute name="id" attributeType="String" defaultValueString=""/>
+        <attribute name="largeImageURL" attributeType="String" defaultValueString=""/>
+        <attribute name="lastName" attributeType="String" defaultValueString=""/>
+        <attribute name="phone" attributeType="String" defaultValueString=""/>
+        <attribute name="state" attributeType="String" defaultValueString=""/>
+        <attribute name="status" attributeType="String" defaultValueString="none"/>
+        <attribute name="thumbnailURL" attributeType="String" defaultValueString=""/>
+        <uniquenessConstraints>
+            <uniquenessConstraint>
+                <constraint value="email"/>
+            </uniquenessConstraint>
+        </uniquenessConstraints>
+    </entity>
+</model>
