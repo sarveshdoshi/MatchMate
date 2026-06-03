@@ -1,0 +1,27 @@
+# Global Engineering Rules
+
+- Never assume requirements
+- Always ask clarification questions
+- TDD first mandatory
+- No implementation before approval
+- Atomic tasks only
+- SwiftUI only
+- MVVM only
+- Clean Architecture mandatory
+- async/await only
+- No force unwraps
+- No TODO comments
+- No inline styling
+- No hardcoded strings
+- Accessibility mandatory
+- Localization mandatory
+- Structured logging mandatory
+- Feature isolation mandatory
+- No direct SDK usage
+- All features require:
+  - Tests
+  - Mocks
+  - Fixtures
+- All tasks must be independently executable
+- Build plans must be atomic
+- Regression validation mandatory
