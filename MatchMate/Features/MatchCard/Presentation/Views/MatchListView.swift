@@ -20,17 +20,15 @@ struct MatchListView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                if !viewModel.isOnline {
-                    offlineBanner
-                }
-
-                content
+        VStack(spacing: 0) {
+            if !viewModel.isOnline {
+                offlineBanner
             }
-            .navigationTitle("Profile Matches")
-            .background(Color(.systemGroupedBackground))
+
+            content
         }
+        .navigationTitle("Profile Matches")
+        .background(Color(.systemGroupedBackground))
         .task {
             await viewModel.fetchMatches()
         }
@@ -106,7 +104,9 @@ struct MatchListView: View {
 // MARK: - Preview
 
 #Preview {
-    MatchListView(viewModel: PreviewFactory.makeViewModel())
+    NavigationStack {
+        MatchListView(viewModel: PreviewFactory.makeViewModel())
+    }
 }
 
 // MARK: - Preview Support
