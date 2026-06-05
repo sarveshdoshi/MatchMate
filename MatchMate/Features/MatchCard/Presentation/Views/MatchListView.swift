@@ -28,17 +28,79 @@ struct MatchListView: View {
             content
         }
         .navigationTitle("Profile Matches")
+        .navigationBarTitleDisplayMode(.large)
         .background(Color(.systemGroupedBackground))
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                filterMenu
+            }
+        }
+        .alert(item: $viewModel.actionAlert) { alert in
+            Alert(
+                title: Text("Action Failed"),
+                message: Text(alert.message),
+                dismissButton: .default(Text("OK"))
+            )
+        }
         .task {
             await viewModel.fetchMatches()
         }
+    }
+
+    // MARK: - Filter Menu
+
+    private var filterMenu: some View {
+        Menu {
+            Picker("Filter matches", selection: $viewModel.filter) {
+                ForEach(MatchFilter.allCases) { option in
+                    Label(option.title, systemImage: option.systemImage)
+                        .tag(option)
+                }
+            }
+        } label: {
+            Image(systemName: "line.3.horizontal.decrease.circle\(viewModel.filter == .all ? "" : ".fill")")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(Theme.primary)
+        }
+        .accessibilityLabel(Text("Filter matches"))
+        .accessibilityValue(Text(viewModel.filter.title))
+    }
+
+    // MARK: - Header
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("People who might be a great match for you")
+                .font(.system(size: 15))
+                .foregroundStyle(Theme.textSecondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 16)
+        .padding(.bottom, 4)
+        .accessibilityAddTraits(.isHeader)
+    }
+
+    // MARK: - Footer
+
+    private var footerNote: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "lock.fill")
+                .font(.system(size: 12))
+            Text("Only you can see your matches and decisions.")
+                .font(.system(size: 13))
+        }
+        .foregroundStyle(Theme.textSecondary)
+        .frame(maxWidth: .infinity)
+        .padding(.top, 8)
+        .padding(.bottom, 16)
+        .accessibilityElement(children: .combine)
     }
 
     // MARK: - Content
 
     @ViewBuilder
     private var content: some View {
-        switch viewModel.state {
+        switch viewModel.filteredState {
         case .idle, .loading:
             LoadingView()
         case let .error(message):
@@ -57,6 +119,8 @@ struct MatchListView: View {
     private func matchList(_ profiles: [MatchProfile]) -> some View {
         ScrollView {
             LazyVStack(spacing: 20) {
+                header
+
                 ForEach(profiles) { profile in
                     MatchCardView(
                         profile: profile,
@@ -65,6 +129,8 @@ struct MatchListView: View {
                     )
                     .animation(.easeInOut(duration: 0.3), value: profile.status)
                 }
+
+                footerNote
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 20)
@@ -76,11 +142,26 @@ struct MatchListView: View {
 
     private var refreshableEmptyState: some View {
         ScrollView {
-            EmptyStateView()
-                .frame(minHeight: 400)
+            EmptyStateView(
+                title: viewModel.filter.emptyTitle,
+                message: viewModel.filter.emptyMessage,
+                systemImage: emptyStateIcon
+            )
+            .frame(minHeight: 400)
         }
         .refreshable {
             await viewModel.fetchMatches()
+        }
+    }
+
+    /// Icon for the empty state: a filter glyph when a filter is hiding results,
+    /// otherwise the default "no matches" glyph.
+    private var emptyStateIcon: String {
+        switch viewModel.filter {
+        case .all:
+            return "heart.slash"
+        case .accepted, .declined:
+            return viewModel.hasAnyProfiles ? viewModel.filter.systemImage : "heart.slash"
         }
     }
 

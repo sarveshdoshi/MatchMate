@@ -9,27 +9,33 @@ import SwiftUI
 
 /// A single match profile card.
 ///
-/// Shows the profile image, name, and location. When undecided it offers
-/// Accept/Decline buttons; once decided it shows a status badge instead.
+/// Lays out a circular avatar (with a decision badge) beside the profile's
+/// compatibility pill, name, and detail rows. A footer hosts the Pass/Connect
+/// actions while undecided, and a status bar once a decision is made.
 struct MatchCardView: View {
     let profile: MatchProfile
     let onAccept: () -> Void
     let onDecline: () -> Void
 
     var body: some View {
-        VStack(spacing: 0) {
-            ProfileImageView(url: profile.largeImageURL)
+        VStack(spacing: 16) {
+            HStack(alignment: .center, spacing: 16) {
+                ProfileAvatarView(url: profile.largeImageURL, status: profile.status)
 
-            VStack(spacing: 16) {
                 details
-
-                actionArea
             }
-            .padding(20)
+
+            Divider()
+                .overlay(Theme.divider)
+
+            actionArea
         }
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .shadow(color: .black.opacity(0.08), radius: 10, x: 0, y: 4)
+        .padding(18)
+        .background(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(Theme.cardSurface)
+        )
+        .shadow(color: .black.opacity(0.06), radius: 12, x: 0, y: 6)
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text(accessibilitySummary))
     }
@@ -37,18 +43,21 @@ struct MatchCardView: View {
     // MARK: - Subviews
 
     private var details: some View {
-        VStack(spacing: 6) {
-            Text(profile.fullName)
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(.teal)
-                .multilineTextAlignment(.center)
+        VStack(alignment: .leading, spacing: 8) {
+            CompatibilityBadgeView(level: profile.compatibility)
 
-            Text(profile.locationSummary)
-                .font(.system(size: 14))
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
+            Text(profile.fullName)
+                .font(.system(size: 22, weight: .bold))
+                .foregroundStyle(Theme.textPrimary)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+
+            VStack(alignment: .leading, spacing: 8) {
+                ProfileInfoRow(systemImage: "mappin.and.ellipse", text: profile.locationSummary)
+                ProfileInfoRow(systemImage: "building.2.fill", text: profile.regionSummary)
+            }
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     @ViewBuilder
@@ -66,12 +75,12 @@ struct MatchCardView: View {
     // MARK: - Accessibility
 
     private var accessibilitySummary: String {
-        var summary = "\(profile.fullName), \(profile.locationSummary)"
+        var summary = "\(profile.fullName), \(profile.compatibility.title), \(profile.locationSummary)"
         switch profile.status {
         case .accepted:
-            summary += ", accepted"
+            summary += ", Member Accepted"
         case .declined:
-            summary += ", declined"
+            summary += ", Member Declined"
         case .none:
             break
         }
@@ -87,22 +96,37 @@ private extension MatchProfile {
     }
 
     var locationSummary: String {
-        "\(age), \(city), \(state)"
+        "\(age), \(city)"
+    }
+
+    var regionSummary: String {
+        [state, country]
+            .filter { !$0.isEmpty }
+            .joined(separator: ", ")
+    }
+
+    /// Presentation-only compatibility rating.
+    ///
+    /// The API provides no compatibility signal, so this is derived
+    /// deterministically from the stable profile id purely to populate the
+    /// redesigned card. Replace with a real domain value when available.
+    var compatibility: Compatibility {
+        abs(id.hashValue).isMultiple(of: 2) ? .high : .maybe
     }
 }
 
 #Preview {
     let base = MatchProfile(
         id: "1",
-        firstName: "Jordan",
-        lastName: "Rivera",
-        age: 28,
-        city: "Austin",
-        state: "Texas",
-        country: "USA",
+        firstName: "Florence",
+        lastName: "Gagné",
+        age: 43,
+        city: "Keswick",
+        state: "Yukon",
+        country: "Canada",
         thumbnailURL: nil,
         largeImageURL: nil,
-        email: "jordan@example.com",
+        email: "florence@example.com",
         phone: "555-0100",
         status: .none
     )
@@ -113,17 +137,17 @@ private extension MatchProfile {
             MatchCardView(
                 profile: MatchProfile(
                     id: "2",
-                    firstName: "Sam",
-                    lastName: "Lee",
-                    age: 31,
-                    city: "Seattle",
-                    state: "Washington",
-                    country: "USA",
+                    firstName: "Nilton",
+                    lastName: "da Luz",
+                    age: 44,
+                    city: "Conselheiro Lafaiete",
+                    state: "Alagoas",
+                    country: "Brazil",
                     thumbnailURL: nil,
                     largeImageURL: nil,
-                    email: "sam@example.com",
+                    email: "nilton@example.com",
                     phone: "555-0101",
-                    status: .accepted
+                    status: .declined
                 ),
                 onAccept: {},
                 onDecline: {}
@@ -131,4 +155,5 @@ private extension MatchProfile {
         }
         .padding()
     }
+    .background(Color(.systemGroupedBackground))
 }
