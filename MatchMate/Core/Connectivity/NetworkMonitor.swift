@@ -26,7 +26,12 @@ final class NetworkMonitor: NetworkMonitorProtocol {
     init(queue: DispatchQueue = DispatchQueue(label: "com.matchmate.networkmonitor")) {
         self.monitor = NWPathMonitor()
         self.queue = queue
-        self.connected = monitor.currentPath.status == .satisfied
+        // NWPathMonitor's `currentPath` is unreliable before `start()` delivers its
+        // first update (it reports unsatisfied at cold launch). Assume connectivity
+        // optimistically so the initial fetch attempts the network; the repository
+        // safely falls back to the cache if that attempt fails. The first real
+        // path update corrects this value moments later.
+        self.connected = true
     }
 
     func start() {

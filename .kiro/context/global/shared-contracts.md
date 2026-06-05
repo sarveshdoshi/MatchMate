@@ -6,44 +6,25 @@ Load this file in any feature tab to understand what's available globally.
 ---
 
 ## Shared Models (Shared/Models/)
-
-| Model    | Owner Feature | Public Interface                          | File                        |
-|----------|---------------|-------------------------------------------|-----------------------------|
-| Country  | auth-login    | `.name`, `.dialCode`, `.isoCode`, `.flag` | Shared/Models/Country.swift |
-
 ---
 
 ## Shared UI Components (Shared/UI/)
 
-| Component           | Description                              | File                              |
-|---------------------|------------------------------------------|-----------------------------------|
-| PrimaryButton       | Loader-morph CTA, successFeedback opt-in | Shared/UI/PrimaryButton.swift     |
-| SearchableListSheet | Generic full-screen searchable sheet     | Shared/UI/SearchableListSheet.swift |
+
 
 ---
 
 ## Shared Resources (Shared/Resources/)
 
-| Resource         | Description                        | File                              |
-|------------------|------------------------------------|-----------------------------------|
-| countryCode.json | Bundled country list (240 entries) | Shared/Resources/countryCode.json |
 
 ---
 
 ## Feature Navigation Routes (public entry points)
 
-| Feature    | Route                          | Payload              |
-|------------|--------------------------------|----------------------|
-| auth-login | `AuthRoute.login`              | —                    |
-| auth-login | `AuthRoute.verifyOTP`          | `MobileNumber`       |
-
 ---
 
 ## Cross-Feature Data Contracts
 
-| Contract       | Owner Feature | Consumers          | Key Detail                                      |
-|----------------|---------------|--------------------|-------------------------------------------------|
-| MobileNumber   | auth-login    | otp-verification   | `.e164` is the only sanctioned API wire-format  |
 
 ---
 

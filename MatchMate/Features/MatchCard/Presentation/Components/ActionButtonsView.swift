@@ -7,64 +7,104 @@
 
 import SwiftUI
 
-/// Accept / Decline circular action buttons shown on an undecided match card.
+/// The Pass / Connect action footer shown on an undecided match card.
+///
+/// A hairline divider separates the two halves; Pass is a quiet outline circle,
+/// Connect is the filled brand affordance.
 struct ActionButtonsView: View {
     let onAccept: () -> Void
     let onDecline: () -> Void
 
     var body: some View {
-        HStack(spacing: 48) {
-            CircularActionButton(
+        HStack(spacing: 0) {
+            ActionButton(
+                title: "Pass",
                 systemImage: "xmark",
-                tint: .orange,
-                accessibilityLabel: "Decline",
+                style: .pass,
                 accessibilityHint: "Declines this match",
                 action: onDecline
             )
 
-            CircularActionButton(
+            Rectangle()
+                .fill(Theme.divider)
+                .frame(width: 1, height: 44)
+
+            ActionButton(
+                title: "Connect",
                 systemImage: "checkmark",
-                tint: .green,
-                accessibilityLabel: "Accept",
+                style: .connect,
                 accessibilityHint: "Accepts this match",
                 action: onAccept
             )
         }
-        .padding(.vertical, 4)
     }
 }
 
-// MARK: - Circular Action Button
+// MARK: - Action Button
 
-private struct CircularActionButton: View {
+private struct ActionButton: View {
+    enum Style {
+        case pass
+        case connect
+    }
+
+    let title: String
     let systemImage: String
-    let tint: Color
-    let accessibilityLabel: String
+    let style: Style
     let accessibilityHint: String
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            Image(systemName: systemImage)
-                .font(.system(size: 22, weight: .bold))
-                .foregroundStyle(tint)
-                .frame(width: 56, height: 56)
-                .background(
-                    Circle()
-                        .fill(tint.opacity(0.12))
-                )
-                .overlay(
-                    Circle()
-                        .strokeBorder(tint.opacity(0.4), lineWidth: 1.5)
-                )
+            VStack(spacing: 6) {
+                Image(systemName: systemImage)
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundStyle(iconForeground)
+                    .frame(width: 44, height: 44)
+                    .background(iconBackground)
+
+                Text(title)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(titleColor)
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .contentShape(Circle())
-        .accessibilityLabel(Text(accessibilityLabel))
+        .accessibilityLabel(Text(title))
         .accessibilityHint(Text(accessibilityHint))
+    }
+
+    // MARK: - Styling
+
+    private var iconForeground: Color {
+        switch style {
+        case .pass: Theme.accent
+        case .connect: .white
+        }
+    }
+
+    @ViewBuilder
+    private var iconBackground: some View {
+        switch style {
+        case .pass:
+            Circle()
+                .fill(Color(.systemBackground))
+                .overlay(Circle().strokeBorder(Theme.divider, lineWidth: 1))
+        case .connect:
+            Circle().fill(Theme.primary)
+        }
+    }
+
+    private var titleColor: Color {
+        switch style {
+        case .pass: Theme.textSecondary
+        case .connect: Theme.primary
+        }
     }
 }
 
 #Preview {
     ActionButtonsView(onAccept: {}, onDecline: {})
+        .padding()
 }

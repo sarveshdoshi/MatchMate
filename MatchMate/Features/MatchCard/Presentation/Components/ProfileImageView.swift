@@ -11,15 +11,11 @@ import SwiftUI
 /// Loads and displays a remote profile image with placeholder and failure handling.
 ///
 /// Wraps SDWebImageSwiftUI's `WebImage` so caching, transitions, and offline
-/// disk-cache behaviour are centralised in one place.
+/// disk-cache behaviour are centralised in one place. The image fills whatever
+/// frame the caller applies, so the parent owns sizing and shape (rectangle,
+/// circle, etc.).
 struct ProfileImageView: View {
     let url: URL?
-    let height: CGFloat
-
-    init(url: URL?, height: CGFloat = 280) {
-        self.url = url
-        self.height = height
-    }
 
     var body: some View {
         WebImage(url: url) { image in
@@ -30,9 +26,6 @@ struct ProfileImageView: View {
             placeholder
         }
         .transition(.fade(duration: 0.3))
-        .frame(maxWidth: .infinity)
-        .frame(height: height)
-        .clipped()
         .accessibilityHidden(true)
     }
 
@@ -40,17 +33,15 @@ struct ProfileImageView: View {
         Rectangle()
             .fill(Color.gray.opacity(0.15))
             .overlay {
-                VStack(spacing: 8) {
-                    Image(systemName: "person.crop.square")
-                        .font(.system(size: 44))
-                        .foregroundStyle(.secondary)
-                    ProgressView()
-                }
+                Image(systemName: "person.fill")
+                    .font(.system(size: 32))
+                    .foregroundStyle(.secondary)
             }
     }
 }
 
 #Preview {
     ProfileImageView(url: nil)
-        .frame(height: 280)
+        .frame(width: 100, height: 100)
+        .clipShape(Circle())
 }
